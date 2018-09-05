@@ -1,0 +1,14 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "redisTest": {
+    "host": "127.0.0.1",
+    "port": 6379,
+    "password": "",
+    "name": "redisTest",
+    "db": "0",
+    "connector": "redis"
+  }
+}
