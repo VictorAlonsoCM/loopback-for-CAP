@@ -1,15 +1,7 @@
 'use strict';
-// Redis
-const redis = require('redis');
-var clientRedis = redis.createClient();
-clientRedis.on('connect', () => {
-  console.log('Connected to Redis...');
-});
-
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var app = module.exports = loopback();
-
 app.start = function() {
   // start the web server
   return app.listen(function() {
@@ -50,22 +42,19 @@ boot(app, __dirname, function(err) {
         }); //find function..
       } //authenticate function..
     }); */
-    // On Connect
+
     let sockets = new Set();
     app.io.on('connection', function(socket) {
       sockets.add(socket);
       console.log(`Socket ${socket.id} added`);
       socket.on('clientmessage', message => {
         console.log('clientmessage', message);
-        clientRedis.rpush('msg', JSON.stringify(message));
-        // console.log(clientRedis.lastsave.message);
         for (const s of sockets) {
           s.emit('message', {msg: message});
         }
       });
-      // On Send
       socket.on('clientdata', data => {
-        // console.log('clientdata', data);
+        console.log('clientdata', data);
         let message = {
           nickname: socket.id,
           message: data,
@@ -73,23 +62,7 @@ boot(app, __dirname, function(err) {
         for (const s of sockets) {
           s.emit('message', {msg: message});
         }
-
-        function mesages(callback) {
-          var re;
-          clientRedis.lrange('msg', 0, -1, function(err, result) {
-            callback(err, result);
-          });
-        };
-        mesages(function(err, result) {
-          // console.log('Here!:', result);
-          result.forEach((element) => {
-            // console.log(JSON.parse(element));
-            socket.emit('getMessages', {msg: JSON.parse(element)});
-          });
-        });
-        // socket.emit('getMessages', {msg: allMessages});
       });
-      // On Disconnect
       socket.on('disconnect', () => {
         console.log(`Deleting socket: ${socket.id}`);
         sockets.delete(socket);
