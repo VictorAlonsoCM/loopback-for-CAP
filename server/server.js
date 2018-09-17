@@ -2,6 +2,9 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var app = module.exports = loopback();
+var users = [];
+var connections = [];
+var messages = [];
 app.start = function() {
   // start the web server
   return app.listen(function() {
@@ -20,7 +23,53 @@ boot(app, __dirname, function(err) {
   if (require.main === module) {
     // Comment this app.start line and add following lines
     // app.start();
-    app.io = require('socket.io')(app.start());
+    //app.io = require('socket.io')(app.start());
+
+    /************************************************** */
+    var io = require('socket.io').listen(app.start());
+    io.sockets.on('connection', (socket)=>{
+      connections.push(socket);
+      console.log('Connected %s sockets connected', connections.length);
+    
+      //Disconnect
+      socket.on('disconnect', (data)=>{
+        //Deletes the disconnected user from the users array
+        users.splice(users.indexOf(socket.username), 1);
+        updateUsernames();
+        connections.splice(connections.indexOf(socket), 1);
+        console.log('Disconnected %s sockets connected', connections.length);
+      });
+    
+      //Send Message
+      socket.on('send message', (data)=>{
+        //console.log(data);
+        io.sockets.emit('new message', {msg: data, user: socket.username});
+        messages.push({msg: data, user: socket.username});
+      });
+    
+      //New User
+      socket.on('new user', (data, callback) => {
+        callback(true);
+        socket.username = data;
+        //console.log(data);
+        users.push(socket.username);
+        reloadMessages();
+        updateUsernames();
+      });
+    
+      //Update all the users each connection
+      function updateUsernames(){
+        io.sockets.emit('get users', users);
+      }
+    
+      function reloadMessages(){
+        io.sockets.emit('get messages', messages);
+        //socket.broadcast.emit('get messages', messages);
+      }
+    });
+
+    /*************************************************** */
+
     /* require('socketio-auth')(app.io, {
       authenticate: function (socket, value, callback) {
         console.log('socket', socket);
@@ -43,11 +92,11 @@ boot(app, __dirname, function(err) {
       } //authenticate function..
     }); */
 
-    let sockets = new Set();
+    /*let sockets = new Set();
     app.io.on('connection', function(socket) {
       sockets.add(socket);
       console.log(`Socket ${socket.id} added`);
-      socket.on('clientmessage', message => {
+        .on('clientmessage', message => {
         console.log('clientmessage', message);
         for (const s of sockets) {
           s.emit('message', {msg: message});
@@ -68,6 +117,6 @@ boot(app, __dirname, function(err) {
         sockets.delete(socket);
         console.log(`Remaining sockets: ${sockets.size}`);
       });
-    });
+    });*/
   }
 });
