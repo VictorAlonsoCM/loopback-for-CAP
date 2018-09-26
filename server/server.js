@@ -33,17 +33,11 @@ boot(app, __dirname, function(err) {
       // Disconnect
       socket.on('disconnect', (data)=>{
         // Deletes the disconnected user from the users array
-        // users.splice(users.indexOf(socket.username), 1);
-        // updateUsernames();
+        users.splice(users.indexOf(socket.user), 1);
+        updateUsernames();
         connections.splice(connections.indexOf(socket), 1);
         console.log('Disconnected %s sockets connected', connections.length);
       });
-      // Send Message to Implement later
-      /* socket.on('send message', (data)=>{
-        //console.log(data);
-        io.sockets.emit('new message', {msg: data, user: socket.username});
-        messages.push({msg: data, user: socket.username});
-      }); */
 
       socket.on('send message', (data)=>{
         // console.log(data);
@@ -51,14 +45,13 @@ boot(app, __dirname, function(err) {
         // messages.push({msg: data, user: socket.username});
       });
       // New User
-      /* socket.on('new user', (data, callback) => {
-        callback(true);
-        socket.username = data;
-        //console.log(data);
-        users.push(socket.username);
-        //reloadMessages();
-        //updateUsernames();
-      }); */
+      socket.on('new user', (data) => {
+        socket.user = data;
+        console.log(data);
+        users.push(socket.user);
+        // reloadMessages();
+        updateUsernames();
+      });
       // Update all the users each connection
       function updateUsernames() {
         io.sockets.emit('get users', users);
@@ -94,7 +87,8 @@ boot(app, __dirname, function(err) {
       } //authenticate function..
     }); */
 
-    /* let sockets = new Set();
+    /*
+    let sockets = new Set();
     app.io.on('connection', function(socket) {
       sockets.add(socket);
       console.log(`Socket ${socket.id} added`);
@@ -119,6 +113,6 @@ boot(app, __dirname, function(err) {
         sockets.delete(socket);
         console.log(`Remaining sockets: ${sockets.size}`);
       });
-    });*/
+    }); */
   }
 });
