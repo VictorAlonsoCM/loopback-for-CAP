@@ -41,7 +41,10 @@ boot(app, __dirname, function(err) {
 
       socket.on('send message', (data)=>{
         // console.log(data);
-        io.sockets.emit('new message', {message: data.message, nickname: data.nickname});
+        io.sockets.emit('new message', {
+          message: data.message,
+          nickname: data.nickname,
+        });
         // messages.push({msg: data, user: socket.username});
       });
       // New User
