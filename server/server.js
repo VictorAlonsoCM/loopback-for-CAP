@@ -4,7 +4,6 @@ var boot = require('loopback-boot');
 var app = module.exports = loopback();
 var users = [];
 var connections = [];
-var messages = [];
 app.start = function() {
   // start the web server
   return app.listen(function() {
@@ -49,19 +48,24 @@ boot(app, __dirname, function(err) {
       });
       // New User
       socket.on('new user', (data) => {
+        data.id = socket.id;
         socket.user = data;
         console.log(data);
         users.push(socket.user);
         // reloadMessages();
         updateUsernames();
       });
+      // Get My Id
+      socket.on('getMyId', (data) => {
+        io.sockets.emit('getId', socket.id);
+      });
       // Update all the users each connection
       function updateUsernames() {
         io.sockets.emit('get users', users);
       };
 
-      function reloadMessages() {
-        io.sockets.emit('get messages', messages);
+      function privateMsg() {
+        // socket.to('hello').emit();
         // socket.broadcast.emit('get messages', messages);
       };
     });
