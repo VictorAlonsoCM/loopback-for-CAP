@@ -1,0 +1,37 @@
+{
+  "name": "privateMessages",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "room": {
+      "type": "string",
+      "required": true
+    },
+    "messages": {
+      "type": "string",
+      "required": true
+    },
+    "idFrom": {
+      "type": "string",
+      "required": true
+    },
+    "idTo": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [{
+  },
+  {
+    "accessType": "*",
+    "principalType": "ROLE",
+    "principalId": "$unauthenticated",
+    "permission": "ALLOW"
+  }],
+  "methods": {}
+}

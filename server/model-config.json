@@ -38,5 +38,9 @@
   "message": {
     "dataSource": "db",
     "public": true
+  },
+  "privateMessages": {
+    "dataSource": "db",
+    "public": true
   }
 }
