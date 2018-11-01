@@ -59,15 +59,24 @@ boot(app, __dirname, function(err) {
       socket.on('getMyId', (data) => {
         io.sockets.emit('getId', socket.id);
       });
+
+      socket.on('sendPrivateInvitation', (data) => {
+        socket.to(data.idSockedTo).emit('receiveRooms', data.room);
+      });
+
+      // Join to a new channel
+      socket.on('userJoinTo', (data) => {
+        socket.join(data);
+      });
+
+      socket.on('newPrivateMessage', (data) => {
+        io.sockets.to(`${data.room}`).emit('chat room', data);
+      });
+
       // Update all the users each connection
       function updateUsernames() {
         io.sockets.emit('get users', users);
-      };
-
-      function privateMsg() {
-        // socket.to('hello').emit();
-        // socket.broadcast.emit('get messages', messages);
-      };
+      }
     });
 
     /** ************************************************* */
