@@ -48,14 +48,13 @@ boot(app, __dirname, function(err) {
       socket.on('new user', (data) => {
         data.id = socket.id;
         socket.user = data;
-        console.log(data);
         users.push(socket.user);
         // reloadMessages();
         updateUsernames();
       });
       // Get My Id
       socket.on('getMyId', (data) => {
-        io.sockets.emit('getId', socket.id);
+        socket.emit('getId', socket.id);
       });
 
       socket.on('sendPrivateInvitation', (data) => {
@@ -74,6 +73,7 @@ boot(app, __dirname, function(err) {
       // Update all the users each connection
       function updateUsernames() {
         io.sockets.emit('get users', users);
+        console.log('Users: ', users);
       }
     });
 
